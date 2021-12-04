@@ -1,0 +1,8 @@
+python graph library:
+    https://pypi.org/project/networkx/
+    https://networkx.org/documentation/stable/
+    pip install networkx[default]
+
+site to get killmail data:
+    https://data.everef.net/killmails/
+    
