@@ -71,4 +71,36 @@ def get_list_of_past_dates(nDays):
 
     return dates
 
+def call_and_retry(func, numAttempts, wait_times, *args, **kwargs):
+    '''
+    Calls 'func' and, if it raises an exception, retries 'numAttempts' times.
+    Arguments:
+        - func: the function to call
+        - numAttempts: how many attempts to make before raising the exception.
+                       If numAttempts == -1: keep trying forever.
+        - wait_times: a list of numbers. If an exception occurs, it waits the number of seconds specified here.
+                      For example wait_times = [3, 6, 9] means that it will wait 3 seconds, then 6, then 9 for all the remaining attempts.
+        - args and kwargs: the arguments to pass to func()
+    '''
+    import time
+    import traceback
+
+    attempts = 0
+    while True:
+        try:
+            ret = func(*args, **kwargs)
+            return ret
+        except:
+            print('error in function ' + str(func.__name__) + ':')
+            print(traceback.format_exc())
+
+            attempts += 1
+            if attempts >= numAttempts and numAttempts != -1:
+                raise
+
+            wait_time = wait_times[min(attempts-1, len(wait_times)-1)]
+            print('waiting ' + str(wait_time) + ' second(s) and retrying...')
+            time.sleep( wait_time )
+
+
 

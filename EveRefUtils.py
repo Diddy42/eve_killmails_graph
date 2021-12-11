@@ -3,7 +3,7 @@ import tarfile
 import time
 import random
 import json
-from utils import getFilesInDir, getJsonFromURL, get_list_of_past_dates
+from utils import getFilesInDir, getJsonFromURL, get_list_of_past_dates, call_and_retry
 
 def update_data(nDays, data_dir):
     dates = get_list_of_past_dates(nDays)
@@ -11,7 +11,7 @@ def update_data(nDays, data_dir):
     check_eventual_updates_of_files(dates, data_dir)
 
 def check_eventual_updates_of_files(date_list, data_dir):   #to be run after download_km_files_for_dates()
-    totals = getJsonFromURL('https://data.everef.net/killmails/totals.json')
+    totals = call_and_retry(getJsonFromURL, 3, [3, 6, 9], 'https://data.everef.net/killmails/totals.json')
 
     for d in date_list:
         filename = from_date_to_filename(d)
@@ -21,7 +21,8 @@ def check_eventual_updates_of_files(date_list, data_dir):   #to be run after dow
         if n_km_server != n_km_local:
             print(filename + ' needs to be updated...')
             year = d.split('-')[0]
-            download_killmail_file('https://data.everef.net/killmails/' + str(year) + '/' + filename, data_dir)
+            #download_killmail_file('https://data.everef.net/killmails/' + str(year) + '/' + filename, data_dir)
+            call_and_retry(download_killmail_file, 3, [3, 6, 9], 'https://data.everef.net/killmails/' + str(year) + '/' + filename, data_dir)
 
 
 
@@ -31,7 +32,8 @@ def download_km_files_for_dates(date_list, data_dir):
 
         if filename not in getFilesInDir(data_dir):
             year = d.split('-')[0]
-            download_killmail_file('https://data.everef.net/killmails/' + str(year) + '/' + filename, data_dir)
+            #download_killmail_file('https://data.everef.net/killmails/' + str(year) + '/' + filename, data_dir)
+            call_and_retry(download_killmail_file, 3, [3, 6, 9], 'https://data.everef.net/killmails/' + str(year) + '/' + filename, data_dir)
 
 def from_date_to_filename(date_str):
     '''

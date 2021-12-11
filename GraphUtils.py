@@ -37,13 +37,29 @@ def build_graph_from_dates(date_list, data_dir):
     
     print(g.number_of_nodes(), g.size())
 
-    #i need to sort it
-    #pr = nx.pagerank(g)
-    #print(pr)
-
     '''connected_components = nx.connected_components(g)
     for cc in connected_components:
         print(cc)'''
 
+    return g
 
-    #show_graph(g)
+def get_connected_components(g):
+    return nx.connected_components(g)
+
+def get_pagerank(g):
+    '''
+    returns a sorted list of tuples like:
+    (1258332334, 0.0011710809446951664)
+    (ch_id, perc)
+    '''
+    pr = nx.pagerank(g)
+    pr_list = []
+
+    for el in list(pr.items()):
+        pr_list.append(el)
+
+    pr_list.sort(key=lambda el: el[1], reverse=True)
+
+    return pr_list
+
+
